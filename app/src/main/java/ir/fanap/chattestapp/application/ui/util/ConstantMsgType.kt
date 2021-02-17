@@ -73,6 +73,7 @@ class ConstantMsgType {
         const val GET_BOT_LIST = "GET_BOT_LIST"
         const val SAFE_LEAVE_THREAD = "SAFE_LEAVE_THREAD"
         const val CLOSE_THREAD = "CLOSE_THREAD"
+        const val GET_ALL_THREADS = "GET_ALL_THREADS"
     }
 
 
@@ -132,7 +133,8 @@ class ConstantMsgType {
         ADD_BOT,
         GET_BOT_LIST,
         SAFE_LEAVE_THREAD,
-        CLOSE_THREAD
+        CLOSE_THREAD,
+        GET_ALL_THREADS
     )
 
     @Retention(AnnotationRetention.SOURCE)

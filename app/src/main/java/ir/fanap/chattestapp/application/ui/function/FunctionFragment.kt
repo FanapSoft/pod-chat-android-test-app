@@ -85,6 +85,7 @@ class FunctionFragment : Fragment(),
     TestListener {
 
 
+    private var offset: Long = 0
     private var nextSearchPosition: Int = 0
     private var searchInMethodsResults: ArrayList<Int> = ArrayList()
 
@@ -801,56 +802,64 @@ class FunctionFragment : Fragment(),
                 getCurrentUserRoles()
             }
             36 -> {
-
                 updateChatProfile()
             }
             37 -> {
-
                 isNameAvailable()
-
             }
             38 -> {
-
                 createPublicThread()
-
             }
             39 -> {
-
-                GetHistoryByType()
-
+                getHistoryByType()
             }
             40 -> {
-
                 AddParticipantByType()
             }
             41 -> {
-
                 createBot()
             }
             42 -> {
-
                 addBotToThread()
             }
             43 -> {
-
                 getThreadBotList()
             }
 
             44 -> {
-
                 safeLeaveThread()
             }
             45 -> {
-
                 closeThread()
+            }
+            46 -> {
+                getAllThreadsList(offset = offset)
             }
 
 
         }
     }
 
-    private fun GetHistoryByType() {
-        Log.e("testtest", "GetHistoryByType")
+    private fun getAllThreadsList(offset: Long) {
+
+        val pos = getPositionOf(ConstantMsgType.GET_ALL_THREADS)
+
+        val requestGetThread = RequestThread.Builder()
+            .count(25)
+            .offset(offset)
+            .build()
+
+        changeIconSend(pos)
+        if (offset == 0L) {
+            changeFunOneState(pos, Method.RUNNING)
+        }
+
+        fucCallback[ConstantMsgType.GET_ALL_THREADS] =
+            mainViewModel.getThreads(requestGetThread)
+
+    }
+
+    private fun getHistoryByType() {
         val pos = getPositionOf(ConstantMsgType.GET_HISTORYWITHMSGTYPE)
         changeIconSend(pos)
         changeFunOneState(pos, Method.RUNNING)
@@ -2207,6 +2216,8 @@ class FunctionFragment : Fragment(),
 
             "CLOSE_THREAD" -> 45
 
+            "GET_ALL_THREADS" -> 46
+
             else -> -1
         }
 
@@ -2276,6 +2287,29 @@ class FunctionFragment : Fragment(),
         super.onGetThread(chatResponse)
 
         if (chatResponse?.uniqueId.isNullOrBlank()) return;
+
+        if (chatResponse?.uniqueId == fucCallback[ConstantMsgType.GET_ALL_THREADS]) {
+
+            val pos = getPositionOf(ConstantMsgType.GET_ALL_THREADS)
+
+            changeFunOneState(pos, Method.DONE)
+
+            if (chatResponse?.result?.isHasNext!!) {
+
+                val contentCount = chatResponse.result?.contentCount
+                offset = chatResponse.result?.nextOffset!!
+                if ((offset / 25L) % 2L == 0L)
+                    showShortToast("received $offset of $contentCount threads")
+
+                getAllThreadsList(offset)
+
+            } else {
+                changeIconReceive(pos)
+                changeFunOneState(pos, Method.DONE)
+                offset = 0
+            }
+
+        }
 
         if (fucCallback[ConstantMsgType.BLOCK_CONTACT] == chatResponse?.uniqueId) {
 
@@ -6367,6 +6401,25 @@ class FunctionFragment : Fragment(),
                     activity,
                     message,
                     Toast.LENGTH_LONG
+                ).show()
+
+
+            }
+        } catch (e: Exception) {
+            Log.e("MTAG", e.message)
+
+        }
+    }
+
+    private fun showShortToast(message: String) {
+
+        try {
+            activity?.runOnUiThread {
+
+                Toast.makeText(
+                    activity,
+                    message,
+                    Toast.LENGTH_SHORT
                 ).show()
 
 
