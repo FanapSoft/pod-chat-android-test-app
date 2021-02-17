@@ -29,10 +29,7 @@ android {
 
         android.applicationVariants.all { variant ->
             variant.outputs.all {
-
                 outputFileName = "PodChatTestApp-v" + defaultConfig.versionName + ".apk"
-
-
             }
         }
         release {

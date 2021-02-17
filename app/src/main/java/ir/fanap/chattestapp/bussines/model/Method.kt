@@ -8,11 +8,8 @@ class Method() {
     companion object{
 
         const val DEACTIVE = 0
-
         const val RUNNING = 1
-
         const val DONE = 2
-
         const val FAIL = 3
 
     }
@@ -35,10 +32,6 @@ class Method() {
     var funcThreeFlag : Boolean? = this.funcThreeState == DONE
     var funcFourFlag : Boolean? = this.funcFourState == DONE
 
-
-
-
-
     var log :String? = null
 
     var logs:ArrayList<LogClass> = ArrayList()
@@ -60,10 +53,7 @@ class Method() {
 
 
     fun addLog(log: LogClass){
-
-
         logs.add(log)
-
     }
 
 

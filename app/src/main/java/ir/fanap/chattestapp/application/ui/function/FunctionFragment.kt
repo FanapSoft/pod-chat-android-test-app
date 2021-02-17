@@ -120,6 +120,7 @@ class FunctionFragment : Fragment(),
     //    private val listOfLogs: ArrayList<LogClass> = ArrayList()
     private var positionLogs: HashMap<Int, ArrayList<LogClass>> = HashMap()
     private var positionRunTime: HashMap<Int, Long> = HashMap()
+    private var subFunctionRunTime: HashMap<Int, Int> = HashMap()
 
 
 //    private val logObservable = SmartHashMap(fucCallback)
@@ -6928,39 +6929,68 @@ class FunctionFragment : Fragment(),
 
     private fun changeFunOneState(position: Int, state: Int) {
 
-        if (chatReady)
+        if (chatReady) {
 
-            functionAdapter.changeFuncOneStateAtPosition(position, state)
+            if (state == Method.RUNNING) {
+                subFunctionRunTime[position] = 0
+                positionRunTime[position] = System.currentTimeMillis()
+            }
+            if (state == Method.DONE) {
+                updateSubFunctionRanTime(position)
+            }
+            functionAdapter.changeFuncOneStateAtPosition(
+                position,
+                state,
+                subFunctionRunTime[position]
+            )
+        }
+
     }
 
+
     private fun changeFunTwoState(position: Int, state: Int) {
-
-        if (chatReady)
-
-            functionAdapter.changeFuncTwoStateAtPosition(position, state)
-
+        if (chatReady) {
+            calcAndUpdateSubFunctionRunTime(state, position)
+            functionAdapter.changeFuncTwoStateAtPosition(
+                position,
+                state,
+                subFunctionRunTime[position]
+            )
+        }
     }
 
 
     private fun changeFunThreeState(pos: Int, state: Int) {
-
-        if (chatReady)
-
-            functionAdapter.changeFuncThreeStateAtPosition(pos, state)
-
-
+        if (chatReady) {
+            calcAndUpdateSubFunctionRunTime(state, pos)
+            functionAdapter.changeFuncThreeStateAtPosition(pos, state, subFunctionRunTime[pos])
+        }
     }
 
 
     private fun changeFunFourState(pos: Int, state: Int) {
 
-        if (chatReady)
-
-            functionAdapter.changeFuncFourStateAtPosition(pos, state)
+        if (chatReady) {
+            calcAndUpdateSubFunctionRunTime(state, pos)
+            functionAdapter.changeFuncFourStateAtPosition(pos, state, subFunctionRunTime[pos])
+        }
 
 
     }
 
+    private fun calcAndUpdateSubFunctionRunTime(state: Int, position: Int) {
+        if (state == Method.RUNNING) {
+            positionRunTime[position] = System.currentTimeMillis()
+        }
+        if (state == Method.DONE) {
+            updateSubFunctionRanTime(position)
+        }
+    }
+
+    private fun updateSubFunctionRanTime(position: Int) {
+        val time = System.currentTimeMillis() - positionRunTime[position]!!
+        this.subFunctionRunTime[position] = subFunctionRunTime[position]!!.plus(time.toInt())
+    }
 
     private fun requestRemoveParticipant(response: ChatResponse<ResultParticipant>?) {
 
@@ -7071,7 +7101,7 @@ class FunctionFragment : Fragment(),
         }
 
 
-        if (choose == 0) {
+//        if (choose == 0) {
 
 //            showNoContactToast()
 //
@@ -7083,7 +7113,7 @@ class FunctionFragment : Fragment(),
 //            changeFunFourState(pos, Method.DEACTIVE)
 
 
-        }
+//        }
     }
 
 
@@ -7145,18 +7175,16 @@ class FunctionFragment : Fragment(),
         methods[position].methodNameFlag = true
 
 
-        val ranTime = System.currentTimeMillis() - positionRunTime[position]!!
-        Log.e(TAG, "Ran $ranTime")
+        Log.e(TAG, "Ran ${subFunctionRunTime[position]}")
         activity?.runOnUiThread {
-            deactiveFunction(position,ranTime)
+            deactiveFunction(position, subFunctionRunTime[position]!!.toLong())
         }
-        positionRunTime.remove(position)
 
 
     }
 
     private fun deactiveFunction(pos: Int, ranTime: Long) {
-       functionAdapter.deActivateFunction(pos,ranTime)
+        functionAdapter.deActivateFunction(pos, ranTime)
     }
 
     private fun deactiveFunction(pos: Int) {

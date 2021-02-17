@@ -626,34 +626,34 @@ class FunctionAdapter(
 
     }
 
-    fun changeFuncOneStateAtPosition(position: Int, state: Int) {
-
-        methods[position].funcOneState = state
-
-        notifyItemChanged(position)
-
+    fun changeFuncOneStateAtPosition(position: Int, state: Int, subRunTime: Int?) {
+            methods[position].funcOneState = state
+            methods[position].ranTime = subRunTime!!.toLong()
+            notifyItemChanged(position)
     }
 
 
-    fun changeFuncTwoStateAtPosition(position: Int, state: Int) {
+    fun changeFuncTwoStateAtPosition(position: Int, state: Int, subRunTime: Int?) {
 
         methods[position].funcTwoState = state
+        methods[position].ranTime = subRunTime!!.toLong()
         notifyItemChanged(position)
 
 
     }
 
-    fun changeFuncThreeStateAtPosition(position: Int, state: Int) {
+    fun changeFuncThreeStateAtPosition(position: Int, state: Int, subRunTime: Int?) {
 
         methods[position].funcThreeState = state
-
+        methods[position].ranTime = subRunTime!!.toLong()
         notifyItemChanged(position)
 
     }
 
-    fun changeFuncFourStateAtPosition(position: Int, state: Int) {
+    fun changeFuncFourStateAtPosition(position: Int, state: Int, subRunTime: Int?) {
 
         methods[position].funcFourState = state
+        methods[position].ranTime = subRunTime!!.toLong()
         notifyItemChanged(position)
 
 
