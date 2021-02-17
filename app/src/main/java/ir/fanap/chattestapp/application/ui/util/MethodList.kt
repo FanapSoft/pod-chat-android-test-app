@@ -52,7 +52,8 @@ class MethodList {
                 "43 Get Bot List",
                 "44 Safe leave Thread",
                 "45 Close Thread",
-                "46 Get All Thread"
+                "46 Get All Thread",
+                "47 Get Full Thread History"
             )
 
 
@@ -104,7 +105,8 @@ class MethodList {
                 "Create Bot",//43
                 "Get Contacts", //44
                 "Get Contacts", //45
-                "Get All threads" //46
+                "Get All threads", //46
+                "Get Threads"
 
             )
 
@@ -156,7 +158,8 @@ class MethodList {
                 "Create Group & Add Bot",//43
                 "Create THRD With MSG", //44
                 "Create THRD With MSG", //45
-                ""
+                "",
+                "Get Full History"//47
             )
 
         val methodFuncThree: MutableList<String> =
@@ -207,7 +210,8 @@ class MethodList {
                 "Get Thread Bot List",//43
                 "Safe Leave Thread", //44
                 "Close Thread", //45
-                ""
+                "",
+                ""//47
             )
 
 
@@ -259,7 +263,8 @@ class MethodList {
                 "", //43
                 "", //44
                 "", //45
-                ""
+                "",
+                ""//47
             )
     }
 }

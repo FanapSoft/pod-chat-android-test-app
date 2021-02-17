@@ -159,7 +159,7 @@ class LogFragment : Fragment(), TestListener, LogAdapter.ViewHolderListener {
         }
 
         //radion group for filter logs
-        radioGroup.setOnCheckedChangeListener { group, i ->
+        radioGroup.setOnCheckedChangeListener { group, _ ->
             when (group.checkedRadioButtonId) {
 
                 R.id.rdb_all -> {

@@ -638,6 +638,12 @@ class FunctionFragment : Fragment(),
 
         val logFragment = SpecificLogFragment()
 
+        logFragment.setCallback(object : SpecificLogFragment.ISpecificLogCallback {
+            override fun onClearLogCallback() {
+                clearPositionLogs(position)
+            }
+        })
+
         val bundle = Bundle()
 
         bundle.putParcelableArrayList("LOGS", logs)
@@ -835,9 +841,29 @@ class FunctionFragment : Fragment(),
             46 -> {
                 getAllThreadsList(offset = offset)
             }
+            47 -> {
+                getThreadForFullHistory()
+            }
 
 
         }
+    }
+
+    private fun getThreadForFullHistory() {
+
+        val pos = getPositionOf(ConstantMsgType.GET_FULL_THREAD_HISTORY)
+
+        val requestGetThread = RequestThread.Builder()
+            .count(25)
+            .offset(0)
+            .build()
+
+        changeIconSend(pos)
+        changeFunOneState(pos, Method.RUNNING)
+
+        fucCallback[ConstantMsgType.GET_FULL_THREAD_HISTORY] =
+            mainViewModel.getThreads(requestGetThread)
+
     }
 
     private fun getAllThreadsList(offset: Long) {
@@ -856,6 +882,20 @@ class FunctionFragment : Fragment(),
 
         fucCallback[ConstantMsgType.GET_ALL_THREADS] =
             mainViewModel.getThreads(requestGetThread)
+
+    }
+
+    private fun getThreadFullHistory(offset: Long) {
+
+        val requestGetHistory = RequestGetHistory
+            .Builder(mainViewModel.getSavedThread()?.id!!)
+            .offset(offset)
+            .count(25)
+            .build()
+
+        fucCallback[ConstantMsgType.GET_FULL_THREAD_HISTORY] =
+            mainViewModel.getHistory(requestGetHistory)
+
 
     }
 
@@ -2218,6 +2258,8 @@ class FunctionFragment : Fragment(),
 
             "GET_ALL_THREADS" -> 46
 
+            "GET_FULL_THREAD_HISTORY" -> 47
+
             else -> -1
         }
 
@@ -2287,6 +2329,25 @@ class FunctionFragment : Fragment(),
         super.onGetThread(chatResponse)
 
         if (chatResponse?.uniqueId.isNullOrBlank()) return;
+
+
+        if (chatResponse?.uniqueId == fucCallback[ConstantMsgType.GET_FULL_THREAD_HISTORY]) {
+
+            val pos = getPositionOf(ConstantMsgType.GET_FULL_THREAD_HISTORY)
+
+            changeFunOneState(pos, Method.DONE)
+
+            val threads = chatResponse?.result?.threads
+
+
+            if (threads != null && threads.isNotEmpty()) {
+                mainViewModel.keepThread(threads.shuffled()[0])
+                changeFunTwoState(pos, Method.RUNNING)
+                getThreadFullHistory(offset)
+            } else {
+                showToast("No thread found!")
+            }
+        }
 
         if (chatResponse?.uniqueId == fucCallback[ConstantMsgType.GET_ALL_THREADS]) {
 
@@ -2490,6 +2551,7 @@ class FunctionFragment : Fragment(),
 
 
     }
+
 
     private fun blockNow(threadList: List<Thread>) {
 
@@ -3686,6 +3748,16 @@ class FunctionFragment : Fragment(),
     override fun onGetHistory(response: ChatResponse<ResultHistory>?) {
         super.onGetHistory(response)
 
+        if (response?.uniqueId == null) return
+
+        if (fucCallback[ConstantMsgType.GET_FULL_THREAD_HISTORY] == response.uniqueId) {
+
+            val pos = getPositionOf(ConstantMsgType.GET_FULL_THREAD_HISTORY)
+
+            changeFunTwoState(pos, Method.DONE)
+
+            prepareGetFullThreadHistory(response, pos)
+        }
 
         if (fucCallback[ConstantMsgType.GET_HISTORY] == response?.uniqueId) {
             val position = 19
@@ -3723,6 +3795,37 @@ class FunctionFragment : Fragment(),
         }
 
 
+    }
+
+    private fun prepareGetFullThreadHistory(
+        response: ChatResponse<ResultHistory>,
+        pos: Int
+    ) {
+        when {
+            response.result?.isHasNext!! -> {
+
+                val contentCount = response.result?.contentCount
+                offset = response.result?.nextOffset!!
+                if ((offset / 25L) % 2L == 0L)
+                    showShortToast("received $offset of $contentCount message")
+
+                getThreadFullHistory(offset)
+
+            }
+            offset == 0L -> {
+                clearPositionLogs(pos)
+                showToast("Changing Thread...")
+                getThreadForFullHistory()
+            }
+            else -> {
+                val contentCount = response.result?.contentCount
+                changeIconReceive(pos)
+                changeFunTwoState(pos, Method.DONE)
+                showShortToast("received $contentCount message at ${subFunctionRunTime[pos]!!/1000L} seconds")
+                offset = 0
+                mainViewModel.clearSavedThread()
+            }
+        }
     }
 
 
@@ -4594,10 +4697,10 @@ class FunctionFragment : Fragment(),
         }
     }
 
-    // After sending the spam request, we will receive 3 responses from the server
-    // on clear history
-    // on leave thread or on thread leave participant
-    // on block
+// After sending the spam request, we will receive 3 responses from the server
+// on clear history
+// on leave thread or on thread leave participant
+// on block
 
     private fun requestSpamThread(response: ChatResponse<ResultThreads>?) {
 
@@ -6507,9 +6610,9 @@ class FunctionFragment : Fragment(),
     }
 
     //Get Thread
-    // If there is no Thread
-    // Its create Thread with someone that has userId
-    // Then send Message to that thread
+// If there is no Thread
+// Its create Thread with someone that has userId
+// Then send Message to that thread
     private fun sendTextMsg() {
 
         val position = getPositionOf(ConstantMsgType.SEND_MESSAGE)
@@ -7118,8 +7221,8 @@ class FunctionFragment : Fragment(),
 
     }
 
-    //handle getContact response to create thread
-    //
+//handle getContact response to create thread
+//
     /**
      * Create the thread to p to p/channel/group. The list below is showing all of the threads type
      * int NORMAL = 0;
@@ -7357,6 +7460,44 @@ class FunctionFragment : Fragment(),
                 }
             }
         }
+
+    }
+
+    private fun clearPositionLogs(position: Int) {
+
+
+        /**
+         *
+         * 1. loop through all received logs
+         *
+         * 2. loop through all uniqueIds of specific function at specific position
+         *
+         * 3. Clear position log
+         *
+         *
+         * */
+
+        val listOfLogs = mainViewModel.listOfLogs
+        val listOfLogsToRemove = ArrayList<LogClass>()
+
+
+        synchronized(positionUniqueIds){
+            //for each unique id that set to this position
+            positionUniqueIds[position]?.forEach { uniqueId ->
+
+                //for each log that received
+                for (log in listOfLogs) {
+
+                    if (log.uniqueId == uniqueId) {
+                        listOfLogsToRemove.add(log)
+                    }
+                }
+            }
+
+
+            listOfLogs.removeAll(listOfLogsToRemove)
+        }
+
 
     }
 

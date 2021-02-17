@@ -1278,6 +1278,12 @@ class ChatFragment : Fragment(), TestListener {
 
         val logFragment = SpecificLogFragment()
 
+        logFragment.setCallback(object : SpecificLogFragment.ISpecificLogCallback {
+            override fun onClearLogCallback() {
+                clearPositionLogs(position)
+            }
+        })
+
         val bundle = Bundle()
 
         bundle.putParcelableArrayList("LOGS", listOfLogs)
@@ -1285,6 +1291,43 @@ class ChatFragment : Fragment(), TestListener {
         logFragment.arguments = bundle
 
         logFragment.show(childFragmentManager, "LOG_FRAG")
+
+
+    }
+
+    private fun clearPositionLogs(position: Int) {
+
+
+        /**
+         *
+         * 1. loop through all received logs
+         *
+         * 2. loop through all uniqueIds of specific function at specific position
+         *
+         * 3. Clear position log
+         *
+         *
+         * */
+
+        val listOfLogs = mainViewModel.listOfLogs
+        val listOfLogsToRemove = ArrayList<LogClass>()
+
+        synchronized(positionUniqueId){
+            //for each unique id that set to this position
+            positionUniqueId[position]?.forEach { uniqueId ->
+
+                //for each log that received
+                for (log in listOfLogs) {
+
+                    if (log.uniqueId == uniqueId) {
+                        listOfLogsToRemove.add(log)
+                    }
+                }
+            }
+
+
+            listOfLogs.removeAll(listOfLogsToRemove)
+        }
 
 
     }

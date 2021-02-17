@@ -12,17 +12,26 @@ import android.view.ViewGroup
 import ir.fanap.chattestapp.R
 import ir.fanap.chattestapp.bussines.model.LogClass
 import kotlinx.android.synthetic.main.specific_log_fragment.*
-import kotlinx.android.synthetic.main.specific_log_fragment.fabGoTop
 
 /**
  * A simple [Fragment] subclass.
  */
-class SpecificLogFragment : BottomSheetDialogFragment() {
+class SpecificLogFragment() : BottomSheetDialogFragment() {
+
+
+    interface ISpecificLogCallback {
+        fun onClearLogCallback();
+    }
 
     private var logs: ArrayList<LogClass> = ArrayList()
 
     private lateinit var logAdapter: LogAdapter2
 
+    private var callback: ISpecificLogCallback? = null
+
+    fun setCallback(callback: ISpecificLogCallback) {
+        this.callback = callback
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -169,6 +178,10 @@ class SpecificLogFragment : BottomSheetDialogFragment() {
             logAdapter.clearLog()
 
             dialog.dismiss()
+
+            callback?.onClearLogCallback()
+
+
 
         }
 
