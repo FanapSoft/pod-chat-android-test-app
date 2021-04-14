@@ -4,6 +4,7 @@ import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.POST;
+import retrofit2.http.Query;
 
 
 /**
@@ -14,7 +15,14 @@ public interface ApiInterface {
 
     @POST("otp/handshake/")
     @FormUrlEncoded
-    Call<HandShakeRes> handShake(@Field("deviceUid") String deviceid);
+    Call<HandShakeRes> handShake(@Field("deviceUID") String deviceid);
+
+    @POST("otp/handshake")
+    Call<HandShakeRes> handShake(@Query("deviceUID") String deviceid,
+                                 @Query("deviceName") String deviceName ,
+                                 @Query("deviceOsVersion")String deviceOsVersion ,
+                                 @Query("deviceOs")String deviceOs ,
+                                 @Query("deviceType")String deviceType);
 
 
 

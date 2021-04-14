@@ -75,6 +75,7 @@ class ConstantMsgType {
         const val CLOSE_THREAD = "CLOSE_THREAD"
         const val GET_ALL_THREADS = "GET_ALL_THREADS"
         const val GET_FULL_THREAD_HISTORY = "GET_FULL_THREAD_HISTORY"
+        const val SEND_BATCH_TEXT_MESSAGE = "SEND_BATCH_TEXT_MESSAGE"
     }
 
 
@@ -136,7 +137,8 @@ class ConstantMsgType {
         SAFE_LEAVE_THREAD,
         CLOSE_THREAD,
         GET_ALL_THREADS,
-        GET_FULL_THREAD_HISTORY
+        GET_FULL_THREAD_HISTORY,
+        SEND_BATCH_TEXT_MESSAGE
     )
 
     @Retention(AnnotationRetention.SOURCE)

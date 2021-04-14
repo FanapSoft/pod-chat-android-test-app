@@ -47,9 +47,7 @@ import com.fanap.podchat.chat.user.user_roles.model.ResultCurrentUserRoles
 import com.fanap.podchat.mainmodel.*
 import com.fanap.podchat.model.*
 import com.fanap.podchat.requestobject.*
-import com.fanap.podchat.util.InviteType
-import com.fanap.podchat.util.TextMessageType
-import com.fanap.podchat.util.ThreadType
+import com.fanap.podchat.util.*
 import com.github.javafaker.Faker
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -91,6 +89,7 @@ class FunctionFragment : Fragment(),
 
     private var contactBIdType: Int = 0
     private var chatReady: Boolean = false
+    private var cache = false
     var TEST_THREAD_ID: Long = 10955L
     var contactIdForOwner: Long = 0
     private var isKeepHistory = false
@@ -131,7 +130,6 @@ class FunctionFragment : Fragment(),
     private lateinit var textView_log: TextView
     private lateinit var functionAdapter: FunctionAdapter
     private var mainServer = false
-    private var isCacheable = false
     private val faker: Faker = Faker()
 
 
@@ -844,26 +842,41 @@ class FunctionFragment : Fragment(),
             47 -> {
                 getThreadForFullHistory()
             }
+            48 -> {
+                sendBatchMessage()
+            }
 
 
         }
     }
 
+    private fun sendBatchMessage() {
+
+        val pos = getPositionOf(ConstantMsgType.SEND_BATCH_TEXT_MESSAGE)
+        changeIconSend(pos)
+        changeFunOneState(pos, Method.RUNNING)
+        val uniqueId = createGetThreadRequest()
+        fucCallback[ConstantMsgType.SEND_BATCH_TEXT_MESSAGE] = uniqueId
+    }
+
     private fun getThreadForFullHistory() {
 
         val pos = getPositionOf(ConstantMsgType.GET_FULL_THREAD_HISTORY)
-
-        val requestGetThread = RequestThread.Builder()
-            .count(25)
-            .offset(0)
-            .build()
-
         changeIconSend(pos)
         changeFunOneState(pos, Method.RUNNING)
 
-        fucCallback[ConstantMsgType.GET_FULL_THREAD_HISTORY] =
-            mainViewModel.getThreads(requestGetThread)
+        val uniqueId = createGetThreadRequest()
+        fucCallback[ConstantMsgType.GET_FULL_THREAD_HISTORY] = uniqueId
 
+
+    }
+
+    private fun createGetThreadRequest(count: Long = 25, offset: Long = 0): String {
+        val requestGetThread = RequestThread.Builder()
+            .count(count)
+            .offset(offset)
+            .build()
+        return mainViewModel.getThreads(requestGetThread)
     }
 
     private fun getAllThreadsList(offset: Long) {
@@ -1291,15 +1304,15 @@ class FunctionFragment : Fragment(),
         buttonConnect.setOnClickListener { connect() }
 
         mainServer = switchCompat_sandBox.isChecked
-        isCacheable = switchCompat_cachState.isChecked
+        cache = switchCompat_cachState.isChecked
 
         switchCompat_sandBox.setOnCheckedChangeListener { _, isChecked ->
             mainServer = isChecked
         }
 
         switchCompat_cachState.setOnCheckedChangeListener { _, isChecked ->
-            isCacheable = isChecked
-            mainViewModel.isCachable(isCacheable)
+            cache = isChecked
+            mainViewModel.isCachable(cache)
         }
 
 
@@ -2079,6 +2092,9 @@ class FunctionFragment : Fragment(),
     override fun onError(chatResponse: ErrorOutPut?) {
         super.onError(chatResponse)
 
+        if(chatResponse?.errorCode==ChatConstant.ERROR_CODE_CHAT_READY.toLong() && cache)
+            return
+
         showToast(chatResponse?.errorMessage!!)
 
         val uniqueId = chatResponse?.uniqueId
@@ -2260,6 +2276,8 @@ class FunctionFragment : Fragment(),
 
             "GET_FULL_THREAD_HISTORY" -> 47
 
+            "SEND_BATCH_TEXT_MESSAGE" -> 48
+
             else -> -1
         }
 
@@ -2330,6 +2348,18 @@ class FunctionFragment : Fragment(),
 
         if (chatResponse?.uniqueId.isNullOrBlank()) return;
 
+        if (chatResponse?.uniqueId == fucCallback[ConstantMsgType.SEND_BATCH_TEXT_MESSAGE]) {
+            val pos = getPositionOf(ConstantMsgType.SEND_BATCH_TEXT_MESSAGE)
+            changeFunOneState(pos, Method.DONE)
+
+            if (chatResponse?.result?.threads?.size!! > 0) {
+                changeFunTwoState(pos, Method.RUNNING)
+                mainViewModel.keepThread(
+                    chatResponse.result?.threads?.shuffled()?.first { thread -> !thread.isClosed })
+                sendBatchTextMessage()
+            } else showToast("Create a thread first!")
+
+        }
 
         if (chatResponse?.uniqueId == fucCallback[ConstantMsgType.GET_FULL_THREAD_HISTORY]) {
 
@@ -2547,6 +2577,27 @@ class FunctionFragment : Fragment(),
 
             handleGetThread(chatResponse?.result, chatResponse?.uniqueId);
 
+        }
+
+
+    }
+
+    private fun sendBatchTextMessage() {
+
+        val thread = mainViewModel.getSavedThread()
+
+        if (thread != null) {
+            val randomCount = Random.nextInt(5, 10)
+            showToast("Sending $randomCount message to ${thread.title}")
+            fucCallbacks[ConstantMsgType.SEND_BATCH_TEXT_MESSAGE] = arrayListOf()
+            for (i in 0..randomCount) {
+                Thread(Runnable {
+                    val uniqueId = sendTextMessageToThread(thread.id)
+                    fucCallbacks[ConstantMsgType.SEND_BATCH_TEXT_MESSAGE]?.add(uniqueId)
+                }).start()
+            }
+            showToast("$randomCount message sent to ${thread.title} id: ${thread.id}")
+            mainViewModel.clearSavedThread()
         }
 
 
@@ -3298,7 +3349,33 @@ class FunctionFragment : Fragment(),
     override fun onSent(response: ChatResponse<ResultMessage>?) {
         super.onSent(response)
 
+        if (response?.uniqueId == null) return
 
+        if(fucCallbacks.containsKey(ConstantMsgType.SEND_BATCH_TEXT_MESSAGE) &&
+            Util.isNotNullOrEmpty(fucCallbacks[ConstantMsgType.SEND_BATCH_TEXT_MESSAGE])
+            && fucCallbacks[ConstantMsgType.SEND_BATCH_TEXT_MESSAGE]!!.contains(response.uniqueId)){
+
+            val keys = fucCallbacks[ConstantMsgType.SEND_BATCH_TEXT_MESSAGE]
+
+            if(keys?.size!!>1){
+                fucCallbacks[ConstantMsgType.SEND_BATCH_TEXT_MESSAGE]?.remove(response.uniqueId)
+            }else if (keys.size ==1){
+                fucCallback[ConstantMsgType.SEND_BATCH_TEXT_MESSAGE] = keys[0]
+                fucCallbacks[ConstantMsgType.SEND_BATCH_TEXT_MESSAGE]?.remove(keys[0])
+            }
+
+        }
+        if(fucCallback[ConstantMsgType.SEND_BATCH_TEXT_MESSAGE]==response.uniqueId){
+
+            val pos = getPositionOf(ConstantMsgType.SEND_BATCH_TEXT_MESSAGE)
+
+            changeIconReceive(pos)
+
+            changeFunTwoState(pos,Method.DONE)
+
+            fucCallback.remove(ConstantMsgType.SEND_BATCH_TEXT_MESSAGE)
+
+        }
 
         if (fucCallback[ConstantMsgType.PIN_UN_PIN_MESSAGE] == response?.uniqueId) {
 
@@ -3812,6 +3889,14 @@ class FunctionFragment : Fragment(),
                 getThreadFullHistory(offset)
 
             }
+            (response.result?.history?.size!!>0 && offset==0L )->{
+                val contentCount = response.result?.contentCount
+                changeIconReceive(pos)
+                changeFunTwoState(pos, Method.DONE)
+                showShortToast("received $contentCount message at ${subFunctionRunTime[pos]!! / 1000L} seconds")
+                offset = 0
+                mainViewModel.clearSavedThread()
+            }
             offset == 0L -> {
                 clearPositionLogs(pos)
                 showToast("Changing Thread...")
@@ -3821,7 +3906,7 @@ class FunctionFragment : Fragment(),
                 val contentCount = response.result?.contentCount
                 changeIconReceive(pos)
                 changeFunTwoState(pos, Method.DONE)
-                showShortToast("received $contentCount message at ${subFunctionRunTime[pos]!!/1000L} seconds")
+                showShortToast("received $contentCount message at ${subFunctionRunTime[pos]!! / 1000L} seconds")
                 offset = 0
                 mainViewModel.clearSavedThread()
             }
@@ -7085,7 +7170,7 @@ class FunctionFragment : Fragment(),
 
     private fun changeFunOneState(position: Int, state: Int) {
 
-        if (chatReady) {
+        if (chatReady || cache) {
 
             if (state == Method.RUNNING) {
                 subFunctionRunTime[position] = 0
@@ -7105,7 +7190,7 @@ class FunctionFragment : Fragment(),
 
 
     private fun changeFunTwoState(position: Int, state: Int) {
-        if (chatReady) {
+        if (chatReady || cache) {
             calcAndUpdateSubFunctionRunTime(state, position)
             functionAdapter.changeFuncTwoStateAtPosition(
                 position,
@@ -7117,7 +7202,7 @@ class FunctionFragment : Fragment(),
 
 
     private fun changeFunThreeState(pos: Int, state: Int) {
-        if (chatReady) {
+        if (chatReady || cache) {
             calcAndUpdateSubFunctionRunTime(state, pos)
             functionAdapter.changeFuncThreeStateAtPosition(pos, state, subFunctionRunTime[pos])
         }
@@ -7126,7 +7211,7 @@ class FunctionFragment : Fragment(),
 
     private fun changeFunFourState(pos: Int, state: Int) {
 
-        if (chatReady) {
+        if (chatReady || cache) {
             calcAndUpdateSubFunctionRunTime(state, pos)
             functionAdapter.changeFuncFourStateAtPosition(pos, state, subFunctionRunTime[pos])
         }
@@ -7308,7 +7393,7 @@ class FunctionFragment : Fragment(),
     private fun getThread() {
 
         val requestThread = RequestThread.Builder().build()
-        requestThread.count = 10;
+        requestThread.count = 25;
         fucCallback[ConstantMsgType.GET_THREAD] = mainViewModel.getThreads(requestThread)
 
         val position = 4
@@ -7350,7 +7435,7 @@ class FunctionFragment : Fragment(),
     /* visibility of progress bar*/
     private fun changeIconSend(position: Int) {
 
-        if (chatReady)
+        if (chatReady || cache)
             activity?.runOnUiThread {
 
                 methods[position].methodNameFlag = false
@@ -7449,15 +7534,17 @@ class FunctionFragment : Fragment(),
             //for each log that received
             for (log in listOfLogs) {
 
-                if (log.uniqueId == uniqueId) {
+                try {
+                    if (log.uniqueId == uniqueId) {
 
-                    if (positionLogs[position] == null)
-                        positionLogs[position] = ArrayList()
+                        if (positionLogs[position] == null)
+                            positionLogs[position] = ArrayList()
 
-                    positionLogs[position]?.add(log)
+                        positionLogs[position]?.add(log)
 
-                    methods[position].addLog(log)
-                }
+                        methods[position].addLog(log)
+                    }
+                } catch (ignored: Exception) {}
             }
         }
 
@@ -7481,7 +7568,7 @@ class FunctionFragment : Fragment(),
         val listOfLogsToRemove = ArrayList<LogClass>()
 
 
-        synchronized(positionUniqueIds){
+        synchronized(positionUniqueIds) {
             //for each unique id that set to this position
             positionUniqueIds[position]?.forEach { uniqueId ->
 

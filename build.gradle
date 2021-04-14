@@ -22,6 +22,18 @@ allprojects {
         jcenter()
         google()
         maven { url "https://s3.amazonaws.com/repo.commonsware.com" }
+        maven { url 'https://jitpack.io' }
+        mavenLocal()
+        maven {
+            name = "pod-chat-android-sdk"
+            url = uri("https://maven.pkg.github.com/FanapSoft/pod-chat-android-sdk")
+            credentials {
+                Properties properties = new Properties()
+                properties.load(project.rootProject.file('local.properties').newDataInputStream())
+                username = properties.getProperty('GITHUB_USER')
+                password = properties.getProperty('GITHUB_PERSONAL_ACCESS_TOKEN')
+            }
+        }
     }
 }
 

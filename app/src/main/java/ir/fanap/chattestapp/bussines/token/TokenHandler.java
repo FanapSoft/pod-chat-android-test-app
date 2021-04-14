@@ -3,6 +3,7 @@ package ir.fanap.chattestapp.bussines.token;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.Log;
@@ -72,7 +73,8 @@ public class TokenHandler {
         @SuppressLint("HardwareIds") String deviceId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
 
 
-        getAPI().handShake(deviceId)
+        getAPI().handShake(deviceId,
+                Build.DEVICE,Build.DEVICE,Build.DEVICE,Build.DEVICE)
                 .enqueue(new Callback<HandShakeRes>() {
                     @Override
                     public void onResponse(Call<HandShakeRes> call, Response<HandShakeRes> response) {
