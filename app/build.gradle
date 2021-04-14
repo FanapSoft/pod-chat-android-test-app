@@ -7,7 +7,7 @@ apply plugin: 'kotlin-android-extensions'
 ext {
 
 //    chatSdkVersion = "0.8.3.0"
-    chatSdkVersion = "0.9.6.3"
+    chatSdkVersion = "0.9.7.4"
 }
 
 android {
@@ -34,14 +34,16 @@ android {
         }
         release {
             minifyEnabled true
+            shrinkResources true
+            debuggable false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
-//        debug {
-//            minifyEnabled true
-//            shrinkResources true
-//            debuggable true
-//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-//        }
+        debug {
+            minifyEnabled false
+            shrinkResources false
+            debuggable true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
 
     }
     /*In order to fix this issue
@@ -92,17 +94,11 @@ dependencies {
 
 
     //CHAT
-    implementation("com.fanap.chat:podchat:$chatSdkVersion")
-
+    implementation ("com.github.FanapSoft:podchat:$chatSdkVersion")
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
     //okHttp
     implementation 'com.squareup.okhttp3:logging-interceptor:3.9.1'
 
     implementation 'com.android.support:multidex:1.0.3'
-
-
-
-
-
 }
