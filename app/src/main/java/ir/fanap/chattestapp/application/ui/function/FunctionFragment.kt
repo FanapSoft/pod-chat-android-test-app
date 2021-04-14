@@ -24,6 +24,10 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import com.fanap.podchat.chat.RoleType
+import com.fanap.podchat.chat.assistant.model.AssistantVo
+import com.fanap.podchat.chat.assistant.request_model.DeActiveAssistantRequest
+import com.fanap.podchat.chat.assistant.request_model.GetAssistantRequest
+import com.fanap.podchat.chat.assistant.request_model.RegisterAssistantRequest
 import com.fanap.podchat.chat.bot.request_model.CreateBotRequest
 import com.fanap.podchat.chat.bot.request_model.DefineBotCommandRequest
 import com.fanap.podchat.chat.bot.request_model.StartAndStopBotRequest
@@ -79,6 +83,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.random.Random
+
 
 class FunctionFragment : Fragment(),
     FunctionAdapter.ViewHolderListener,
@@ -714,7 +719,7 @@ class FunctionFragment : Fragment(),
                 addParticipant()
             }
             11 -> {
-                removeParticipant()
+                removeParticipant(ConstantMsgType.REMOVE_PARTICIPANT)
             }
             12 -> {
                 forwardMessage()
@@ -844,6 +849,15 @@ class FunctionFragment : Fragment(),
             47 -> {
                 getThreadForFullHistory()
             }
+            48 -> {
+                registerAssistant()
+            }
+            49 -> {
+                deactiveAssistant()
+            }
+            52 -> {
+                removeParticipant(ConstantMsgType.REMOVE_PARCICIPANT_WITH_CORE_USER_ID)
+            }
 
 
         }
@@ -863,6 +877,40 @@ class FunctionFragment : Fragment(),
 
         fucCallback[ConstantMsgType.GET_FULL_THREAD_HISTORY] =
             mainViewModel.getThreads(requestGetThread)
+
+    }
+
+    private fun registerAssistant() {
+
+        val pos = getPositionOf(ConstantMsgType.REGISTER_ASSISTANT)
+
+        val requestGetContact = RequestGetContact.Builder().build()
+
+        changeIconSend(pos)
+        changeFunOneState(pos, Method.RUNNING)
+
+        fucCallback[ConstantMsgType.REGISTER_ASSISTANT] =
+            mainViewModel.getContact(requestGetContact)
+
+    }
+
+    private fun deactiveAssistant() {
+
+        val pos = getPositionOf(ConstantMsgType.DEACTIVE_ASSISTANT)
+
+        val request =
+            GetAssistantRequest.Builder().typeCode("default").setOffset(0).setCount(10)
+
+        val uniqueId =
+            mainViewModel.getAssistants(request.build())
+
+        if (uniqueId?.get(0) != null) {
+            fucCallback[ConstantMsgType.DEACTIVE_ASSISTANT] = uniqueId
+        }
+
+        changeIconSend(pos)
+        changeFunOneState(pos, Method.RUNNING)
+
 
     }
 
@@ -2260,6 +2308,12 @@ class FunctionFragment : Fragment(),
 
             "GET_FULL_THREAD_HISTORY" -> 47
 
+            "REGISTER_ASSISTANT" -> 48
+
+            "DEACTIVE_ASSISTANT" -> 49
+
+            "REMOVE_PARCICIPANT_WITH_CORE_USER_ID" -> 52
+
             else -> -1
         }
 
@@ -2511,7 +2565,19 @@ class FunctionFragment : Fragment(),
             val position = getPositionOf(ConstantMsgType.REMOVE_PARTICIPANT)
             changeFunOneState(position, Method.DONE)
             changeFunTwoState(position, Method.RUNNING)
-            prepareRemoveParticipants(chatResponse)
+            prepareRemoveParticipants(chatResponse, ConstantMsgType.REMOVE_PARTICIPANT)
+
+        }
+
+        if (fucCallback[ConstantMsgType.REMOVE_PARCICIPANT_WITH_CORE_USER_ID] == chatResponse?.uniqueId) {
+
+            val position = getPositionOf(ConstantMsgType.REMOVE_PARCICIPANT_WITH_CORE_USER_ID)
+            changeFunOneState(position, Method.DONE)
+            changeFunTwoState(position, Method.RUNNING)
+            prepareRemoveParticipants(
+                chatResponse,
+                ConstantMsgType.REMOVE_PARCICIPANT_WITH_CORE_USER_ID
+            )
 
         }
 
@@ -2859,7 +2925,10 @@ class FunctionFragment : Fragment(),
     }
 
 
-    private fun prepareRemoveParticipants(chatResponse: ChatResponse<ResultThreads>?) {
+    private fun prepareRemoveParticipants(
+        chatResponse: ChatResponse<ResultThreads>?,
+        functionKey: String
+    ) {
 
 
         var targetThreadId = 0L
@@ -2898,8 +2967,7 @@ class FunctionFragment : Fragment(),
                 .build()
 
 
-            fucCallback[ConstantMsgType.REMOVE_PARTICIPANT] = mainViewModel.getParticipant(request)
-
+            fucCallback[functionKey] = mainViewModel.getParticipant(request)
 
         }
 
@@ -3821,7 +3889,7 @@ class FunctionFragment : Fragment(),
                 val contentCount = response.result?.contentCount
                 changeIconReceive(pos)
                 changeFunTwoState(pos, Method.DONE)
-                showShortToast("received $contentCount message at ${subFunctionRunTime[pos]!!/1000L} seconds")
+                showShortToast("received $contentCount message at ${subFunctionRunTime[pos]!! / 1000L} seconds")
                 offset = 0
                 mainViewModel.clearSavedThread()
             }
@@ -3940,6 +4008,16 @@ class FunctionFragment : Fragment(),
             changeFunTwoState(position, Method.DONE)
             changeFunThreeState(position, Method.RUNNING)
             requestRemoveParticipant(response)
+
+        }
+
+
+        if (fucCallback[ConstantMsgType.REMOVE_PARCICIPANT_WITH_CORE_USER_ID] == response?.uniqueId) {
+
+            val position = getPositionOf(ConstantMsgType.REMOVE_PARCICIPANT_WITH_CORE_USER_ID)
+            changeFunTwoState(position, Method.DONE)
+            changeFunThreeState(position, Method.RUNNING)
+            requestRemoveParticipantWithCoreUserId(response)
 
         }
 
@@ -5026,6 +5104,16 @@ class FunctionFragment : Fragment(),
 
         }
 
+        if (response?.uniqueId == fucCallback[ConstantMsgType.REMOVE_PARCICIPANT_WITH_CORE_USER_ID]) {
+
+            val pos = getPositionOf(ConstantMsgType.REMOVE_PARCICIPANT_WITH_CORE_USER_ID)
+
+            changeIconReceive(pos)
+
+            changeFunThreeState(pos, Method.DONE)
+
+        }
+
 
     }
 
@@ -5277,6 +5365,103 @@ class FunctionFragment : Fragment(),
 
             handleCLoseThread(contactList)
         }
+
+        if (fucCallback[ConstantMsgType.REGISTER_ASSISTANT] == response?.uniqueId) {
+
+            val pos = getPositionOf(ConstantMsgType.REGISTER_ASSISTANT)
+
+            changeFunOneState(pos, Method.DONE)
+
+            changeFunTwoState(pos, Method.RUNNING)
+
+            handleRegisterAssistant(contactList)
+        }
+    }
+
+    override fun onRegisterAssistant(response: ChatResponse<MutableList<AssistantVo>>?) {
+        super.onRegisterAssistant(response)
+
+        if (fucCallback[ConstantMsgType.REGISTER_ASSISTANT] == response?.uniqueId) {
+            val pos = getPositionOf(ConstantMsgType.REGISTER_ASSISTANT)
+            getAssistants()
+            changeFunTwoState(pos, Method.DONE)
+            changeFunThreeState(pos, Method.RUNNING)
+        }
+    }
+
+    override fun onGetAssistants(response: ChatResponse<MutableList<AssistantVo>>?) {
+        super.onGetAssistants(response)
+        val assistants = response?.result
+        if (fucCallback[ConstantMsgType.REGISTER_ASSISTANT] == response?.uniqueId) {
+            val pos = getPositionOf(ConstantMsgType.REGISTER_ASSISTANT)
+
+            changeFunThreeState(pos, Method.DONE)
+            changeIconReceive(pos)
+        }
+
+        if (fucCallback[ConstantMsgType.DEACTIVE_ASSISTANT] == response?.uniqueId) {
+            val pos = getPositionOf(ConstantMsgType.DEACTIVE_ASSISTANT)
+            changeFunOneState(pos, Method.DONE)
+            changeFunTwoState(pos, Method.RUNNING)
+            handleDeactiveAssistant(assistants as ArrayList<AssistantVo>)
+
+        }
+    }
+
+    override fun onDeActiveAssistant(response: ChatResponse<MutableList<AssistantVo>>?) {
+        super.onDeActiveAssistant(response)
+
+        if (fucCallback[ConstantMsgType.DEACTIVE_ASSISTANT] == response?.uniqueId) {
+            val pos = getPositionOf(ConstantMsgType.DEACTIVE_ASSISTANT)
+
+            changeFunTwoState(pos, Method.DONE)
+            changeIconReceive(pos)
+        }
+    }
+
+    fun handleDeactiveAssistant(assistantList: ArrayList<AssistantVo>) {
+        val pos = getPositionOf(ConstantMsgType.DEACTIVE_ASSISTANT)
+        if (assistantList.size > 0) {
+
+            val invite = Invitee(
+                assistantList.get(0).participantVO?.id,
+                InviteType.Constants.TO_BE_USER_ID
+            )
+
+
+            val assistantVos: MutableList<AssistantVo> = ArrayList()
+            val assistantVo = AssistantVo()
+            assistantVo.invitees = invite
+            assistantVos.add(assistantVo)
+
+
+            val request = DeActiveAssistantRequest.Builder(assistantVos)
+
+            val uniqueId =
+                mainViewModel.deactiveAssistant(request.build())
+
+            if (uniqueId?.get(0) != null) {
+                fucCallback[ConstantMsgType.DEACTIVE_ASSISTANT] = uniqueId
+            }
+        } else {
+            changeFunTwoState(pos, Method.DONE)
+            //  changeIconReceive(pos)
+            setErrorOnFunctionInPosition(pos)
+            showNoAssistantToast()
+        }
+    }
+
+    fun getAssistants() {
+
+        val request =
+            GetAssistantRequest.Builder().typeCode("default").setOffset(0).setCount(10)
+
+        val uniqueId =
+            mainViewModel.getAssistants(request.build())
+
+        if (uniqueId?.get(0) != null) {
+            fucCallback[ConstantMsgType.REGISTER_ASSISTANT] = uniqueId
+        }
     }
 
     fun handleSafeLeave(contactList: ArrayList<Contact>?) {
@@ -5328,6 +5513,62 @@ class FunctionFragment : Fragment(),
 
             changeFunTwoState(pos, Method.DEACTIVE)
         }
+    }
+
+    fun handleRegisterAssistant(contactList: ArrayList<Contact>?) {
+
+        val pos = getPositionOf(ConstantMsgType.REGISTER_ASSISTANT)
+
+
+        if (contactList != null) {
+            var choose = 0
+            for (contact: Contact in contactList) {
+                if (contact.isHasUser) {
+                    val registerAssistantRequest: RegisterAssistantRequest.Builder =
+                        RegisterAssistantRequest.Builder(getAssistantsVos(contact.id))
+
+                    val uniqueId =
+                        mainViewModel.registerAssistant(registerAssistantRequest.build())
+
+                    choose++
+                    if (uniqueId?.get(0) != null) {
+                        fucCallback[ConstantMsgType.REGISTER_ASSISTANT] = uniqueId
+                    }
+                    break
+                }
+            }
+
+            if (choose == 0) {
+
+                showNoContactToast()
+
+                deactiveFunction(pos)
+
+                changeFunTwoState(pos, Method.DEACTIVE)
+
+
+            }
+
+        } else {
+            showNoContactToast()
+
+            deactiveFunction(pos)
+
+            changeFunTwoState(pos, Method.DEACTIVE)
+        }
+    }
+
+    fun getAssistantsVos(contactId: Long): List<AssistantVo> {
+        val invite = Invitee(contactId, InviteType.Constants.TO_BE_USER_CONTACT_ID)
+        val typeRoles: ArrayList<String> = ArrayList()
+        typeRoles.add(RoleType.Constants.REMOVE_ROLE_FROM_USER)
+        var assistantVos: MutableList<AssistantVo> = mutableListOf()
+        val assistantVo = AssistantVo()
+        assistantVo.invitees = invite
+        assistantVo.contactType = "default"
+        assistantVo.roles = typeRoles
+        assistantVos.add(assistantVo)
+        return assistantVos
     }
 
     fun handleCLoseThread(contactList: ArrayList<Contact>?) {
@@ -6253,7 +6494,7 @@ class FunctionFragment : Fragment(),
 
         changeFunThreeState(pos, Method.DONE)
         changeIconReceive(pos)
-        // fucCallback[ConstantMsgType.ADD_BOT] = mainViewModel.getThreadBotList(null);
+     //    fucCallback[ConstantMsgType.ADD_BOT] = mainViewModel.getThreadBotList(null);
 
     }
 
@@ -6554,6 +6795,27 @@ class FunctionFragment : Fragment(),
         }
     }
 
+    private fun showNoAssistantToast() {
+
+        val message = "You haven't any Assistant"
+
+        try {
+            activity?.runOnUiThread {
+
+                Toast.makeText(
+                    activity,
+                    message,
+                    Toast.LENGTH_LONG
+                ).show()
+
+
+            }
+        } catch (e: Exception) {
+            Log.e("MTAG", e.message)
+
+        }
+    }
+
     private fun handleUpdateContact(contactList: ArrayList<Contact>?) {
 
         var selected = false
@@ -6662,13 +6924,13 @@ class FunctionFragment : Fragment(),
         fucCallback[ConstantMsgType.LEAVE_THREAD] = mainViewModel.getContact(requestGetContact)
     }
 
-    private fun removeParticipant() {
+    private fun removeParticipant(functionKey: String) {
 
-        val position = 11
+        val position = getPositionOf(functionKey)
         changeIconSend(position)
         changeFunOneState(position, Method.RUNNING)
         val requestThread = RequestThread.Builder().build()
-        fucCallback[ConstantMsgType.REMOVE_PARTICIPANT] = mainViewModel.getThreads(requestThread)
+        fucCallback[functionKey] = mainViewModel.getThreads(requestThread)
 
 
     }
@@ -7182,6 +7444,80 @@ class FunctionFragment : Fragment(),
                         .build()
 
                 fucCallback[ConstantMsgType.REMOVE_PARTICIPANT] =
+                    mainViewModel.removeParticipant(requestRemoveParticipant)
+
+
+            } else {
+
+                targetParticipant = participants.last()
+
+                showToast("No regular participant found. Removing an Admin...")
+
+                val parIdList = ArrayList<Long>()
+
+                parIdList.add(targetParticipant.id)
+
+                val requestRemoveParticipant =
+                    RemoveParticipantRequest.Builder(response.subjectId, parIdList)
+                        .build()
+
+                fucCallback[ConstantMsgType.REMOVE_PARTICIPANT] =
+                    mainViewModel.removeParticipant(requestRemoveParticipant)
+
+
+            }
+
+
+        } else {
+
+            showToast("No participant found to remove")
+
+            val pos = getPositionOf(ConstantMsgType.REMOVE_PARTICIPANT)
+
+            deactiveFunction(pos)
+
+            changeFunThreeState(pos, Method.DEACTIVE)
+
+
+        }
+
+    }
+
+    private fun requestRemoveParticipantWithCoreUserId(response: ChatResponse<ResultParticipant>?) {
+
+
+        val participants = response?.result?.participants!!
+
+        var targetParticipant: Participant? = null
+
+        if (participants.size > 0) {
+
+
+            for (participant in participants) {
+
+
+                if (!participant.admin) {
+
+
+                    targetParticipant = participant
+
+                }
+            }
+
+
+            if (targetParticipant != null) {
+                val inviteeList = ArrayList<Invitee>()
+
+                //SET INVITEE LIST
+                val invite = Invitee(targetParticipant.coreUserId, InviteType.Constants.TO_BE_CORE_USER_ID)
+                inviteeList.add(invite)
+
+                val requestRemoveParticipant =
+                    RemoveParticipantRequest.Builder(response.subjectId, null)
+                        .setInvitees(inviteeList)
+                        .build()
+
+                fucCallback[ConstantMsgType.REMOVE_PARCICIPANT_WITH_CORE_USER_ID] =
                     mainViewModel.removeParticipant(requestRemoveParticipant)
 
 

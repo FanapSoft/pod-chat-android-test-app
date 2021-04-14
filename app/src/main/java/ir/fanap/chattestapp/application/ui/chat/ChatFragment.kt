@@ -1663,8 +1663,7 @@ class ChatFragment : Fragment(), TestListener {
         val requestFileMessage =
             RequestFileMessage.Builder(
                 activity, response!!.result.thread.id, fileUri,
-                TextMessageType.Constants.POD_SPACE_FILE
-            )
+                TextMessageType.Constants.POD_SPACE_FILE)
                 .setUserGroupHash(response.result.thread.userGroupHash)
                 .build()
 

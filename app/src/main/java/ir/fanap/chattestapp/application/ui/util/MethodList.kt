@@ -53,7 +53,14 @@ class MethodList {
                 "44 Safe leave Thread",
                 "45 Close Thread",
                 "46 Get All Thread",
-                "47 Get Full Thread History"
+                "47 Get Full Thread History",
+                "48 Register Asistant",
+                "49 DeActive Assistant",
+                "50 Block Assistant",
+                "51 UnBlock Assistant",
+                "52 Remove Participant With Core User id",
+                "53 Get Bot List",
+                "54 Convert Private to Public"
             )
 
 
@@ -106,7 +113,15 @@ class MethodList {
                 "Get Contacts", //44
                 "Get Contacts", //45
                 "Get All threads", //46
-                "Get Threads"
+                "Get Threads",//47
+                "Get Contacts",//48
+                "Get Assistants",//49
+                "",//50
+                "",//51
+                "Get THRDs",//52
+                "",//53
+                ""//54
+
 
             )
 
@@ -159,7 +174,15 @@ class MethodList {
                 "Create THRD With MSG", //44
                 "Create THRD With MSG", //45
                 "",
-                "Get Full History"//47
+                "Get Full History",//47
+                "Register Assistant",//48
+                "Deactive Assistants",//49
+                "",//50
+                "",//51
+                "Get THRD Participants",//52
+                "",//53
+                ""//54
+
             )
 
         val methodFuncThree: MutableList<String> =
@@ -210,8 +233,16 @@ class MethodList {
                 "Get Thread Bot List",//43
                 "Safe Leave Thread", //44
                 "Close Thread", //45
-                "",
-                ""//47
+                "",//46
+                "",//47
+                "Get Assistants",//48
+                "",//49
+                "",//50
+                "",//51
+                "Remove Participant from GP With C_I_D",//52
+                "",//53
+                ""//54
+
             )
 
 
@@ -263,8 +294,16 @@ class MethodList {
                 "", //43
                 "", //44
                 "", //45
-                "",
-                ""//47
+                "",//46
+                "",//47
+                "",//48
+                "",//49
+                "",//50
+                "",//51
+                "",//52
+                "",//53
+                ""//54
+
             )
     }
 }

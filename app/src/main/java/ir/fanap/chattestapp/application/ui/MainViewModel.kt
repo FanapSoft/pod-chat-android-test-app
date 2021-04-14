@@ -13,6 +13,10 @@ import android.widget.Toast
 import com.fanap.podchat.ProgressHandler
 import com.fanap.podchat.chat.Chat
 import com.fanap.podchat.chat.ChatListener
+import com.fanap.podchat.chat.assistant.model.AssistantVo
+import com.fanap.podchat.chat.assistant.request_model.DeActiveAssistantRequest
+import com.fanap.podchat.chat.assistant.request_model.GetAssistantRequest
+import com.fanap.podchat.chat.assistant.request_model.RegisterAssistantRequest
 import com.fanap.podchat.chat.bot.request_model.CreateBotRequest
 import com.fanap.podchat.chat.bot.request_model.DefineBotCommandRequest
 import com.fanap.podchat.chat.bot.request_model.StartAndStopBotRequest
@@ -150,6 +154,22 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 testListener.onBotStopped(response)
             }
 
+            override fun onRegisterAssistant(response: ChatResponse<MutableList<AssistantVo>>?) {
+                super.onRegisterAssistant(response)
+
+                testListener.onRegisterAssistant(response)
+            }
+
+            override fun onDeActiveAssistant(response: ChatResponse<MutableList<AssistantVo>>?) {
+                super.onDeActiveAssistant(response)
+                testListener.onDeActiveAssistant(response)
+            }
+
+            override fun onGetAssistants(response: ChatResponse<MutableList<AssistantVo>>?) {
+                super.onGetAssistants(response)
+                testListener.onGetAssistants(response)
+            }
+
             override fun onChatProfileUpdated(response: ChatResponse<ResultUpdateProfile>?) {
                 super.onChatProfileUpdated(response)
 
@@ -157,7 +177,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
 
             }
-//            onThreadLeaveParticipant
+//
 
 
             override fun onRemoveRoleFromUser(outputSetRoleToUser: ChatResponse<ResultSetAdmin>?) {
@@ -726,6 +746,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return chat.createThreadWithMessage(requestCreateThread)
     }
 
+    fun registerAssistant(request: RegisterAssistantRequest): String? {
+        return chat.registerAssistant(request)
+    }
+
+    fun getAssistants(request: GetAssistantRequest): String? {
+        return chat.getAssistants(request)
+    }
+
+    fun deactiveAssistant(request: DeActiveAssistantRequest): String? {
+        return chat.deactiveAssistant(request)
+    }
+
+
     fun updateContact(requestUpdateContact: RequestUpdateContact): String {
         return chat.updateContact(requestUpdateContact)
     }
@@ -771,7 +804,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun getThreadBotList(request: StartAndStopBotRequest): String {
-        //    return chat.startBot(request)
+//           return chat.getBlockList(request)
         return ""
     }
 

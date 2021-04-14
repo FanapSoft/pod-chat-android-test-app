@@ -75,6 +75,9 @@ class ConstantMsgType {
         const val CLOSE_THREAD = "CLOSE_THREAD"
         const val GET_ALL_THREADS = "GET_ALL_THREADS"
         const val GET_FULL_THREAD_HISTORY = "GET_FULL_THREAD_HISTORY"
+        const val REGISTER_ASSISTANT = "REGISTER_ASSISTANT"
+        const val DEACTIVE_ASSISTANT = "DEACTIVE_ASSISTANT"
+        const val REMOVE_PARCICIPANT_WITH_CORE_USER_ID = "REMOVE_PARCICIPANT_WITH_CORE_USER_ID"
     }
 
 
@@ -136,7 +139,10 @@ class ConstantMsgType {
         SAFE_LEAVE_THREAD,
         CLOSE_THREAD,
         GET_ALL_THREADS,
-        GET_FULL_THREAD_HISTORY
+        GET_FULL_THREAD_HISTORY,
+        REGISTER_ASSISTANT,
+        DEACTIVE_ASSISTANT,
+        REMOVE_PARCICIPANT_WITH_CORE_USER_ID
     )
 
     @Retention(AnnotationRetention.SOURCE)

@@ -1,5 +1,6 @@
 package ir.fanap.chattestapp.application.ui
 
+import com.fanap.podchat.chat.assistant.model.AssistantVo
 import com.fanap.podchat.chat.bot.result_model.CreateBotResult
 import com.fanap.podchat.chat.bot.result_model.DefineBotCommandResult
 import com.fanap.podchat.chat.bot.result_model.StartStopBotResult
@@ -193,6 +194,17 @@ interface TestListener {
 
     }
 
+    fun onRegisterAssistant(response: ChatResponse<MutableList<AssistantVo>>?){
+
+    }
+
+    fun onDeActiveAssistant(response: ChatResponse<MutableList<AssistantVo>>?) {
+
+    }
+
+     fun onGetAssistants(response: ChatResponse<MutableList<AssistantVo>>?) {
+
+    }
     fun onBotStopped(response: ChatResponse<StartStopBotResult>?) {
 
     }
