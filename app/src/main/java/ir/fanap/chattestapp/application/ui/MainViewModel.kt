@@ -22,6 +22,7 @@ import com.fanap.podchat.chat.bot.request_model.DefineBotCommandRequest
 import com.fanap.podchat.chat.bot.request_model.StartAndStopBotRequest
 import com.fanap.podchat.chat.bot.result_model.CreateBotResult
 import com.fanap.podchat.chat.bot.result_model.DefineBotCommandResult
+import com.fanap.podchat.chat.bot.result_model.GetUserBotsResult
 import com.fanap.podchat.chat.bot.result_model.StartStopBotResult
 import com.fanap.podchat.chat.mention.model.RequestGetMentionList
 import com.fanap.podchat.chat.pin.pin_message.model.RequestPinMessage
@@ -277,7 +278,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 testListener.onAddContact(response)
             }
 
-
+            override fun onUserBots(response: ChatResponse<GetUserBotsResult>?) {
+                super.onUserBots(response)
+            }
             override fun onRemoveContact(
                 content: String?,
                 response: ChatResponse<ResultRemoveContact>?

@@ -16,7 +16,7 @@
         android:orientation="horizontal">
 
         <RadioButton
-            android:id="@+id/rdb_others"
+            android:id="@+id/rdb_getthread"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/radio_flat_selector"
@@ -29,7 +29,7 @@
             android:text="سایر" />
 
         <RadioButton
-            android:id="@+id/rdb_cache"
+            android:id="@+id/rdb_createthread"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/radio_flat_selector"

@@ -64,6 +64,17 @@
                 app:bt_shape="@drawable/transition_background_drawable_default"
                 app:bt_title="@string/tab_upload"
                 app:bt_titlePadding="8dp"/>
+        <com.gauravk.bubblenavigation.BubbleToggleView
+                android:id="@+id/c_item_test"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:bt_colorActive="@color/green_active"
+                app:bt_colorInactive="@color/green_inactive"
+                app:bt_icon="@drawable/ic_dashboard_black_24dp"
+                app:bt_padding="12dp"
+                app:bt_shape="@drawable/transition_background_drawable_default"
+                app:bt_title="@string/tab_tests"
+                app:bt_titlePadding="8dp"/>
     </com.gauravk.bubblenavigation.BubbleNavigationConstraintView>
 
     <!--<android.support.v7.widget.AppCompatImageView-->

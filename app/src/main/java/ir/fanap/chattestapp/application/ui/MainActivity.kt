@@ -18,7 +18,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main_bubble)
 
 
-        val titles = arrayOf("Chat", "Function", "Log")
+        val titles = arrayOf("Chat", "Function", "Log", "Test")
         val viewPager: ViewPager = findViewById(R.id.view_pager)
         val pagerAdapter = PagerAdapter(supportFragmentManager, titles)
 
@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
         top_navigation_constraint.setNavigationChangeListener { view, position ->
             view_pager.setCurrentItem(position, true)
         }
-        viewPager.offscreenPageLimit = 2
+        viewPager.offscreenPageLimit = 3
 
 
     }

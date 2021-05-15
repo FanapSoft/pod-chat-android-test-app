@@ -9,6 +9,7 @@
     <!--Tab's name-->
     <string name="tab_function">Function</string>
     <string name="tab_upload">Upload</string>
+    <string name="tab_tests">Tests</string>
     <string name="tab_chat">chat</string>
     <string name="tab_log">Log</string>
     <string name="action_search">search</string>

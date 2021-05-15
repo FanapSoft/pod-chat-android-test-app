@@ -21,9 +21,6 @@ import com.fanap.podchat.util.ChatMessageType
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import ir.fanap.chattestapp.bussines.model.LogClass
-import rx.android.schedulers.AndroidSchedulers
-import rx.schedulers.Schedulers
-import kotlin.math.log
 
 
 class LogFragment : Fragment(), TestListener, LogAdapter.ViewHolderListener {
@@ -72,7 +69,7 @@ class LogFragment : Fragment(), TestListener, LogAdapter.ViewHolderListener {
         val linearLayoutManager = LinearLayoutManager(context)
         recyclerView.layoutManager = linearLayoutManager
 
-        rdb_cache = view.findViewById(R.id.rdb_cache)
+        rdb_cache = view.findViewById(R.id.rdb_createthread)
 
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
 
@@ -177,10 +174,10 @@ class LogFragment : Fragment(), TestListener, LogAdapter.ViewHolderListener {
                 R.id.rdb_response -> {
                     selected = SelectedFilterType.FILTER_RESPONSE;
                 }
-                R.id.rdb_others -> {
+                R.id.rdb_getthread -> {
                     selected = SelectedFilterType.FILTER_OTHERS;
                 }
-                R.id.rdb_cache -> {
+                R.id.rdb_createthread -> {
                     selected = SelectedFilterType.FILTER_CACHE;
                 }
 
