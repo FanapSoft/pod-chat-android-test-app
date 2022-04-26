@@ -2,7 +2,7 @@ package ir.fanap.chattestapp.application.ui.chat
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.arch.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider
 import android.content.Context
 import android.content.Intent
 import android.database.Cursor
@@ -13,9 +13,9 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.provider.OpenableColumns
-import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.AppCompatImageView
+import androidx.fragment.app.Fragment
+import androidx.core.content.ContextCompat
+import androidx.appcompat.widget.AppCompatImageView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -462,7 +462,7 @@ class ChatFragment : Fragment(), TestListener {
 
             }
         } catch (e: Exception) {
-            Log.e("MTAG", e.message)
+            e.message?.let { Log.e("MTAG", it) }
         }
 
 
@@ -520,7 +520,7 @@ class ChatFragment : Fragment(), TestListener {
 
                                 }
                             } catch (e: Exception) {
-                                Log.e("MTAG", e.message)
+                                e.message?.let { Log.e("MTAG", it) }
                             }
 
 
@@ -608,7 +608,7 @@ class ChatFragment : Fragment(), TestListener {
 
             }
         } catch (e: Exception) {
-            Log.e("MTAG", e.message)
+            e.message?.let { Log.e("MTAG", it) }
         }
 
 
@@ -631,7 +631,7 @@ class ChatFragment : Fragment(), TestListener {
                 calcRanTime(textViewRanTimeUploadFile)
             }
         } catch (e: Exception) {
-            Log.e("MTAG", e.message)
+            e.message?.let { Log.e("MTAG", it) }
         }
 
 
@@ -653,7 +653,7 @@ class ChatFragment : Fragment(), TestListener {
 
             }
         } catch (e: Exception) {
-            Log.e("MTAG", e.message)
+            e.message?.let { Log.e("MTAG", it) }
         }
 
 
@@ -744,7 +744,7 @@ class ChatFragment : Fragment(), TestListener {
 
             }
         } catch (e: Exception) {
-            Log.e("MTAG", e.message)
+            e.message?.let { Log.e("MTAG", it) }
         }
 
 
@@ -912,7 +912,7 @@ class ChatFragment : Fragment(), TestListener {
 
                 }
             } catch (e: Exception) {
-                Log.e("MTAG", e.message)
+                e.message?.let { Log.e("MTAG", it) }
             }
 
 
@@ -985,7 +985,7 @@ class ChatFragment : Fragment(), TestListener {
 
             }
         } catch (e: Exception) {
-            Log.e("MTAG", e.message)
+            e.message?.let { Log.e("MTAG", it) }
         }
     }
 
@@ -1011,7 +1011,7 @@ class ChatFragment : Fragment(), TestListener {
 
             }
         } catch (e: Exception) {
-            Log.e("MTAG", e.message)
+            e.message?.let { Log.e("MTAG", it) }
         }
     }
 
@@ -1034,7 +1034,7 @@ class ChatFragment : Fragment(), TestListener {
                 calcRanTime(textViewRanTimeSendLocationMessage)
 
             } catch (e: Exception) {
-                Log.e("MTAG", e.message)
+                e.message?.let { Log.e("MTAG", it) }
             }
 
         }
@@ -1065,7 +1065,7 @@ class ChatFragment : Fragment(), TestListener {
 
             }
         } catch (e: Exception) {
-            Log.e("MTAG", e.message)
+            e.message?.let { Log.e("MTAG", it) }
         }
 
 
@@ -1127,7 +1127,7 @@ class ChatFragment : Fragment(), TestListener {
 
                             }
                         } catch (e: Exception) {
-                            Log.e("MTAG", e.message)
+                            e.message?.let { Log.e("MTAG", it) }
                         }
 
 
@@ -1690,7 +1690,7 @@ class ChatFragment : Fragment(), TestListener {
 
                         }
                     } catch (e: Exception) {
-                        Log.e("MTAG", e.message)
+                        e.message?.let { Log.e("MTAG", it) }
                     }
 
                 }
@@ -1729,7 +1729,7 @@ class ChatFragment : Fragment(), TestListener {
 
                         }
                     } catch (e: Exception) {
-                        Log.e("MTAG", e.message)
+                        e.message?.let { Log.e("MTAG", it) }
                     }
 
 

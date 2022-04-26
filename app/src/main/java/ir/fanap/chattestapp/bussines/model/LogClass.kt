@@ -6,9 +6,9 @@ import java.util.ArrayList
 
 data class LogClass(val uniqueId: String, val logName: String, var log: String) : Parcelable {
     constructor(parcel: Parcel) : this(
-        parcel.readString(),
-        parcel.readString(),
-        parcel.readString()
+        parcel.readString()!!,
+        parcel.readString()!!,
+        parcel.readString()!!
     )
 
     var shoinglog: String = ""

@@ -10,7 +10,7 @@ import kotlinx.android.synthetic.main.demo_spinner.view.*
 
 class MethodsSpinnerAdapter(ctx: Context?,
                             moods: List<String>) :
-    ArrayAdapter<String>(ctx, 0, moods) {
+    ArrayAdapter<String>(ctx!!, 0, moods) {
 
     override fun getView(position: Int, recycledView: View?, parent: ViewGroup): View {
         return this.createView(position, recycledView, parent)

@@ -1,6 +1,6 @@
 package ir.fanap.chattestapp.application.ui.util
 
-import android.support.annotation.StringDef
+import androidx.annotation.StringDef
 
 class ConstantMsgTypeMultipleTest {
 

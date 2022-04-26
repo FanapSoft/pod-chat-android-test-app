@@ -2,9 +2,10 @@ package ir.fanap.chattestapp.application.ui.util
 
 import android.content.Context
 import android.graphics.PointF
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.LinearSmoothScroller
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSmoothScroller
+import androidx.recyclerview.widget.RecyclerView
+
 
 class SnappingLinearLayoutManager(context: Context, orientation: Int, reverseLayout: Boolean)
     : LinearLayoutManager(context,orientation,reverseLayout)
@@ -17,7 +18,7 @@ class SnappingLinearLayoutManager(context: Context, orientation: Int, reverseLay
         startSmoothScroll(smoothScroller)
     }
 
-    private class TopSnappedSmoothScroller(context: Context) :LinearSmoothScroller(context){
+    private class TopSnappedSmoothScroller(context: Context) : LinearSmoothScroller(context){
 
 //        override fun computeScrollVectorForPosition(targetPosition: Int): PointF? {
 //            return this.SnappingLinearLayoutManager.

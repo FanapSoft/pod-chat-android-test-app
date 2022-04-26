@@ -27,7 +27,7 @@ fun refactorLog(logName: String, log: String, gson: Gson): ArrayList<LogClass> {
     val jsonReader = try {
         JSONObject(log)
     } catch (e: Exception) {
-        Log.e("LTAG", e.message)
+        e.message?.let { Log.e("MTAG", it) }
         null
     }
 
@@ -70,7 +70,7 @@ fun refactorLog(logName: String, log: String, gson: Gson): ArrayList<LogClass> {
 
             }
         } catch (e: Exception) {
-            Log.e("LTAG", e.message)
+            e.message?.let { Log.e("MTAG", it) }
         }
 
 

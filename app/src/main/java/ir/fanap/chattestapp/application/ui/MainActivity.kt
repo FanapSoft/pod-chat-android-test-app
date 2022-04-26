@@ -1,8 +1,8 @@
 package ir.fanap.chattestapp.application.ui
 
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.support.v4.view.ViewPager
+import androidx.viewpager.widget.ViewPager
 import com.fanap.podchat.notification.PodNotificationManager
 import kotlinx.android.synthetic.main.activity_main_bubble.*
 import ir.fanap.chattestapp.R

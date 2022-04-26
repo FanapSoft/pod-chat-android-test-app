@@ -6,8 +6,8 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.0'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.21"
+        classpath 'com.android.tools.build:gradle:7.0.4'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.20"
 
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
 
@@ -19,11 +19,8 @@ buildscript {
 
 allprojects {
     repositories {
-        jcenter()
+
         google()
-        maven { url "https://s3.amazonaws.com/repo.commonsware.com" }
-        maven { url 'https://jitpack.io' }
-        mavenLocal()
         maven {
             name = "pod-chat-android-sdk"
             url = uri("https://maven.pkg.github.com/FanapSoft/pod-chat-android-sdk")
@@ -35,6 +32,16 @@ allprojects {
 
             }
         }
+//        maven {
+//            name = 'PodchatSnapshots'
+//            Properties properties = new Properties()
+//            properties.load(project.rootProject.file('local.properties').newDataInputStream())
+//            url = properties.getProperty('snapshotRepo')
+//        }
+        maven { url "https://s3.amazonaws.com/repo.commonsware.com" }
+        maven { url 'https://jitpack.io' }
+        jcenter()
+
     }
 }
 

@@ -1,9 +1,9 @@
 package ir.fanap.chattestapp.application.ui
 
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentPagerAdapter
-import android.support.v4.app.FragmentStatePagerAdapter
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
+import androidx.fragment.app.FragmentStatePagerAdapter
 import ir.fanap.chattestapp.application.ui.chat.ChatFragment
 import ir.fanap.chattestapp.application.ui.function.FunctionFragment
 import ir.fanap.chattestapp.application.ui.log.LogFragment

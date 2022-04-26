@@ -1,17 +1,16 @@
 package ir.fanap.chattestapp.application.ui.function
 
 import android.app.Activity
-import android.arch.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider
 import android.content.Context
 import android.os.Bundle
 import android.os.Handler
-import android.support.constraint.ConstraintLayout
-import android.support.design.widget.BottomSheetBehavior
-import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat
-import android.support.v4.widget.NestedScrollView
-import android.support.v7.app.AppCompatDelegate
-import android.support.v7.widget.*
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.Fragment
+import androidx.core.content.ContextCompat
+import androidx.core.widget.NestedScrollView
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.widget.*
 import android.text.InputType
 import android.util.Log
 import android.view.LayoutInflater
@@ -23,6 +22,9 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSmoothScroller
+import androidx.recyclerview.widget.RecyclerView
 import com.fanap.podchat.chat.RoleType
 import com.fanap.podchat.chat.assistant.model.AssistantVo
 import com.fanap.podchat.chat.assistant.request_model.DeActiveAssistantRequest
@@ -55,6 +57,7 @@ import com.fanap.podchat.util.InviteType
 import com.fanap.podchat.util.TextMessageType
 import com.fanap.podchat.util.ThreadType
 import com.github.javafaker.Faker
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.wang.avi.AVLoadingIndicatorView
@@ -1343,6 +1346,7 @@ class FunctionFragment : Fragment(),
 
         switchCompat_sandBox.setOnCheckedChangeListener { _, isChecked ->
             mainServer = isChecked
+            connect()
         }
 
         switchCompat_cachState.setOnCheckedChangeListener { _, isChecked ->
@@ -3036,7 +3040,7 @@ class FunctionFragment : Fragment(),
 
                     }
                 } catch (e: Exception) {
-                    Log.d("MTAG", e.message)
+                    e.message?.let { Log.d("MTAG", it) }
                     continue
                 }
 
@@ -3297,7 +3301,7 @@ class FunctionFragment : Fragment(),
 
                     }
                 } catch (e: Exception) {
-                    Log.d("MTAG", e.message)
+                    e.message?.let { Log.d("MTAG", it) }
                     continue
                 }
 
@@ -6750,7 +6754,7 @@ class FunctionFragment : Fragment(),
 
             }
         } catch (e: Exception) {
-            Log.e("MTAG", e.message)
+            e.message?.let { Log.e("MTAG", it) }
 
         }
     }
@@ -6769,7 +6773,7 @@ class FunctionFragment : Fragment(),
 
             }
         } catch (e: Exception) {
-            Log.e("MTAG", e.message)
+            e.message?.let { Log.e("MTAG", it) }
 
         }
     }
@@ -6790,7 +6794,7 @@ class FunctionFragment : Fragment(),
 
             }
         } catch (e: Exception) {
-            Log.e("MTAG", e.message)
+            e.message?.let { Log.e("MTAG", it) }
 
         }
     }
@@ -6811,7 +6815,7 @@ class FunctionFragment : Fragment(),
 
             }
         } catch (e: Exception) {
-            Log.e("MTAG", e.message)
+            val let = e.message?.let { Log.e("MTAG", it) }
 
         }
     }

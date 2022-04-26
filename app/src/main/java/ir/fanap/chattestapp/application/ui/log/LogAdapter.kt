@@ -4,16 +4,16 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.graphics.Color
 import android.os.Build
-import android.support.design.widget.FloatingActionButton
-import android.support.v4.content.ContextCompat
-import android.support.v4.content.ContextCompat.getSystemService
-import android.support.v7.widget.RecyclerView
+import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import android.text.Html
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import ir.fanap.chattestapp.R
 import ir.fanap.chattestapp.application.ui.function.FunctionAdapter
 import ir.fanap.chattestapp.bussines.model.LogClass
@@ -204,7 +204,7 @@ class LogAdapter(
 
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = android.content.ClipData.newPlainText("Copied Text", text)
-        clipboard.primaryClip = clip
+        clipboard.setPrimaryClip(clip)
 
         Toast.makeText(context, "Text Copied to clipboard", Toast.LENGTH_LONG)
             .show()
